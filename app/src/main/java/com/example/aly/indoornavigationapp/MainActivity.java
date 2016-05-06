@@ -9,9 +9,7 @@ import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button postBtn=(Button)findViewById(R.id.postBtn);
+
         mainText=(TextView)findViewById(R.id.textView);
 
         // Initiate wifi service manager
@@ -57,8 +56,16 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
 
+        Button settingsBtn = (Button) findViewById(R.id.settingsBtn);
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Settings.class);
+                startActivity(intent);
+            }
+        });
+    }
     class WifiReceiver extends BroadcastReceiver {
 
         // This method call when number of wifi connections changed

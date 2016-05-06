@@ -7,28 +7,38 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.aly.indoornavigationapp.MainActivity">
+    tools:context="com.example.aly.indoornavigationapp.Places">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wifi Avaliable" />
-
-    <Button
-        android:id="@+id/postBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:text="Position" />
+        android:layout_alignParentTop="true"
+        android:text="Add Place"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <Button
-        android:id="@+id/settingsBtn"
+    <EditText
+        android:id="@+id/namePlaceTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/addPlaceBtn"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView3"
+        android:layout_toStartOf="@+id/addPlaceBtn" />
+
+    <ListView
+        android:id="@+id/placesListView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:text="Settings" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/namePlaceTxt" />
 
+    <Button
+        android:id="@+id/addPlaceBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/textView3"
+        android:text="Add" />
 </RelativeLayout>
