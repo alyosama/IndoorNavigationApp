@@ -22,23 +22,22 @@
         android:id="@+id/namePlaceTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/addPlaceBtn"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView3"
-        android:layout_toStartOf="@+id/addPlaceBtn" />
+        android:layout_below="@+id/textView3" />
 
     <ListView
         android:id="@+id/placesListView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/namePlaceTxt" />
+        android:layout_below="@+id/addPlaceBtn"
+        android:background="#4fc4f6" />
 
     <Button
         android:id="@+id/addPlaceBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/textView3"
+        android:layout_below="@+id/namePlaceTxt"
         android:text="Add" />
 </RelativeLayout>
