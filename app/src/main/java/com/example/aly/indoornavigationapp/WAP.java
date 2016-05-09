@@ -25,8 +25,6 @@ public class WAP extends AppCompatActivity {
 
     WifiManager mainWifi;
     WifiReceiver receiverWifi;
-    List<ScanResult> wifiList;
-    StringBuilder sb = new StringBuilder();
 
     ListView lv;
     ArrayAdapter<String> arrayAdapter;
@@ -76,6 +74,8 @@ public class WAP extends AppCompatActivity {
                 // wifi scaned value broadcast receiver
                 receiverWifi = new WifiReceiver();
 
+                //TODO send items to fill when wifichanged
+
                 // Register broadcast receiver
                 // Broacast receiver will automatically call when number of wifi connections changed
                 registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -89,38 +89,5 @@ public class WAP extends AppCompatActivity {
 
     }
 
-    class WifiReceiver extends BroadcastReceiver {
-
-        // This method call when number of wifi connections changed
-        public void onReceive(Context c, Intent intent) {
-
-            sb = new StringBuilder();
-            wifiList = mainWifi.getScanResults();
-            //sb.append("\n        Number Of Wifi connections :"+wifiList.size()+"\n\n");
-
-            for (int i = 0; i < wifiList.size(); i++) {
-
-                db.addWAP(wifiList.get(i).BSSID, wifiList.get(i).SSID);
-                arrayAdapter.add(wifiList.get(i).SSID);
-
-               /*
-                sb.append(new Integer(i+1).toString() + ". "+wifiList.get(i).SSID+" : ");
-                double distance=calculateDistance(wifiList.get(i).level,wifiList.get(i).frequency);
-                sb.append(String.format("%.4f", distance));
-                sb.append(" meters\n\n");
-                */
-            }
-
-
-            //mainText.setText(sb);
-        }
-
-        // Calcuate Distance From WIFI Access Point
-        public double calculateDistance(double signalLevelInDb, double freqInMHz) {
-            double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
-            return Math.pow(10.0, exp);
-        }
-
-    }
 
 }

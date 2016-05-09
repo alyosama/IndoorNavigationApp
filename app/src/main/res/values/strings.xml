@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">IndoorNavigationApp</string>
+    <string-array name="places_names">
+        <item>Seminar Room 1</item>
+        <item>Seminar Room 2</item>
+        <item>Seminar Room 3</item>
+        <item>Logic Lab</item>
+    </string-array>
 </resources>
