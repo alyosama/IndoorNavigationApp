@@ -80,4 +80,12 @@
         android:layout_below="@+id/recordBtn"
         android:text="Export" />
 
+    <Button
+        android:id="@+id/placesConf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/exportBtn"
+        android:text="Places Con" />
+
 </RelativeLayout>

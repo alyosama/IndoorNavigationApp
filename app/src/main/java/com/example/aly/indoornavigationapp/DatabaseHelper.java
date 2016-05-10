@@ -24,9 +24,10 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "indoor.db";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String WAP_TABLE_NAME = "WAP";
     public static final String PLACES_TABLE_NAME = "Places";
+    private static final String DATASET_TABLE_NAME = "Dataset";
 
     DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,26 +37,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String sql_wap = "CREATE TABLE " + WAP_TABLE_NAME +
-                "( BSSID text not null, SSID text not null);";
+                "( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, BSSID text not null, SSID text not null, Freq INTEGER);";
 
-        String sql_places = "CREATE TABLE " + PLACES_TABLE_NAME + " ( ID INTEGER PRIMARY KEY, Name text not null );";
+        String sql_places = "CREATE TABLE " + PLACES_TABLE_NAME +
+                " ( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, Name text not null, Number INTEGER not null" +
+                " X FLOAT not null, Y FLOAT not null );";
 
         db.execSQL(sql_wap);
         db.execSQL(sql_places);
 
-
+        createDataSetTable(db);
+/*
         //TODO Remove these two lines
         String DATASET_TABLE_SQL = "CREATE TABLE Dataset ( F0 INTEGER, F1 INTEGER, Class INTEGER);";
         db.execSQL(DATASET_TABLE_SQL);
-
+*/
     }
 
 
-    public void createDataSetTable(ArrayList<String> featuresNames) {
+    public void createDataSetTable(ArrayList<Integer> featuresIDs) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String DATASET_TABLE_SQL = "CREATE TABLE Dataset ( F0 INTEGER";
-        for (int i = 1; i < featuresNames.size(); i++) {
-            DATASET_TABLE_SQL += ", F" + i + " INTEGER";
+        String DATASET_TABLE_SQL = "CREATE TABLE Dataset ( F" + featuresIDs.get(0) + " INTEGER";
+        for (int i = 1; i < featuresIDs.size(); i++) {
+            DATASET_TABLE_SQL += ", F" + featuresIDs.get(i) + " INTEGER";
         }
         DATASET_TABLE_SQL += ");";
 
@@ -64,11 +68,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public void createDataSetTable() {
-        SQLiteDatabase db = this.getWritableDatabase();
+    public void createDataSetTable(SQLiteDatabase db) {
         String DATASET_TABLE_SQL = "CREATE TABLE Dataset ( F0 INTEGER, F1 INTEGER, Class INTEGER);";
         db.execSQL(DATASET_TABLE_SQL);
-        db.close();
     }
 
     /**
@@ -83,8 +85,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put("F" + String.valueOf(i), features[i]);
         }
         // Inserting Row
-        db.insert("Dataset", null, values);
-        db.close(); // Closing database connection
+        db.insert(DATASET_TABLE_NAME, null, values);
     }
 
     public void exportTheDataSet() throws IOException {
@@ -137,28 +138,61 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + PLACES_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + WAP_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DATASET_TABLE_NAME);
+        onCreate(db);
+
     }
 
     public void voidDropPlaces() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + PLACES_TABLE_NAME);
-        db.close();
+
     }
 
     public void voidDropWAP() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + WAP_TABLE_NAME);
-        db.close();
+
     }
 
+    public void clearDatabase() {
+        this.getWritableDatabase().execSQL("delete from Places");
+        this.getWritableDatabase().close();
+    }
 
-    public void addPlace(String name) {
+    public void addPlace(String name, int number, float[] viewCoords) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("Name", name); // Contact Name
+        values.put("Number", number);
+        values.put("X", viewCoords[0]);
+        values.put("Y", viewCoords[1]);
         // Inserting Row
         db.insert(PLACES_TABLE_NAME, null, values);
-        db.close(); // Closing database connection
+    }
+
+    public float[] getPlaceLocation(int number) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] conditions = {String.valueOf(number)};
+        float[] coord = new float[2];
+        Cursor c = db.rawQuery("Select X,Y from Places where Number like ?", conditions);
+        coord[0] = c.getFloat(0);
+        coord[1] = c.getFloat(1);
+
+        db.close();
+        return coord;
+    }
+
+    public Cursor fetchAllPlaces() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] rowDetails = {"Name", "Number", "X", "Y"};
+        Cursor cursor = db.query(PLACES_TABLE_NAME, rowDetails, null, null, null, null, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        db.close();
+        return cursor;
     }
 
     public void addWAP(String bssid, String ssid) {
@@ -195,15 +229,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor fetchAllPlaces() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String[] rowDetails = {"Name"};
-        Cursor cursor = db.query(PLACES_TABLE_NAME, rowDetails, null, null, null, null, null);
-        if (cursor != null)
-            cursor.moveToFirst();
-        db.close();
-        return cursor;
-    }
 
    /* public void deleteMovie(String name){
         movieDatabase=getWritableDatabase();

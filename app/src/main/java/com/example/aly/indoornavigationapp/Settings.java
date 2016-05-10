@@ -137,6 +137,15 @@ public class Settings extends AppCompatActivity {
             }
         });
 
+        Button placeConfButton = (Button) findViewById(R.id.placesConf);
+        placeConfButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Settings.this, Places.class);
+                startActivity(i);
+            }
+        });
+
 
     }
 
