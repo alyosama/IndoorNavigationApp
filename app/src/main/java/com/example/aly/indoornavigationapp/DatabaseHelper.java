@@ -46,18 +46,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(sql_wap);
         db.execSQL(sql_places);
 
-        createDataSetTable(db);
-/*
-        //TODO Remove these two lines
-        String DATASET_TABLE_SQL = "CREATE TABLE Dataset ( F0 INTEGER, F1 INTEGER, Class INTEGER);";
-        db.execSQL(DATASET_TABLE_SQL);
-*/
+        //createDataSetTable(db);
     }
 
 
     public void createDataSetTable(ArrayList<Integer> featuresIDs) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String DATASET_TABLE_SQL = "CREATE TABLE Dataset ( F" + featuresIDs.get(0) + " INTEGER";
+        String DATASET_TABLE_SQL = "CREATE TABLE " + DATASET_TABLE_NAME + " ( F" + featuresIDs.get(0) + " INTEGER";
         for (int i = 1; i < featuresIDs.size(); i++) {
             DATASET_TABLE_SQL += ", F" + featuresIDs.get(i) + " INTEGER";
         }
@@ -65,12 +60,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(DATASET_TABLE_SQL);
         db.close();
-    }
-
-
-    public void createDataSetTable(SQLiteDatabase db) {
-        String DATASET_TABLE_SQL = "CREATE TABLE Dataset ( F0 INTEGER, F1 INTEGER, Class INTEGER);";
-        db.execSQL(DATASET_TABLE_SQL);
     }
 
     /**
@@ -88,54 +77,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(DATASET_TABLE_NAME, null, values);
     }
 
-    public void exportTheDataSet() throws IOException {
-
-        File root = new File(Environment.getExternalStorageDirectory(), "Datasets");
-        if (!root.exists()) {
-            root.mkdirs();
-        }
-
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-        String TimeStampDB = sdf.format(cal.getTime());
-
-        SQLiteDatabase db;
-        try {
-
-            File gpxfile = new File(root, TimeStampDB + ".csv");
-            gpxfile.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(gpxfile);
-            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append("F0;F1;Class");
-            myOutWriter.append("\n");
-
-            db = this.getWritableDatabase();
-            String[] rowDetails = {"F0", "F1", "Class"};
-            Cursor c = db.query("Dataset", rowDetails, null, null, null, null, null);
-
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        myOutWriter.append(c.getString(0) + ";" + c.getString(1) + ";" + c.getString(2));
-                        myOutWriter.append("\n");
-                    }
-
-                    while (c.moveToNext());
-                }
-
-                c.close();
-                myOutWriter.close();
-                fOut.close();
-
-            }
-
-            db.close();
-
-        } catch (SQLiteException se) {
-            Log.e(getClass().getSimpleName(), "Could not create or Open the database");
-        }
-
-    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + PLACES_TABLE_NAME);
@@ -195,33 +136,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public void addWAP(String bssid, String ssid) {
+    public void addWAP(int id, String bssid, String ssid, int freq) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("BSSID", bssid); // Contact Name
         values.put("SSID", ssid);
-
+        values.put("Freq", freq);
         // Inserting Row
         db.insert(WAP_TABLE_NAME, null, values);
         db.close(); // Closing database connection
     }
 
-    public boolean searchWAP(String bssid) {
+    public int getWAPID(String ssid) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "select * from " + WAP_TABLE_NAME + " where BSSID=\"" + bssid + "\"";
+        String query = "select ID from " + WAP_TABLE_NAME + " where SSID=\"" + ssid + "\"";
         Cursor cursor = db.rawQuery(query, null);
 
+        int id;
         if (cursor != null && cursor.getCount() > 0) {
-            return true;
+            id = cursor.getInt(0);
         } else {
-            cursor.close();
-            return false;
+            id = -1;
         }
+        cursor.close();
+        return id;
     }
 
     public Cursor fetchAllWAPS() {
         SQLiteDatabase db = this.getWritableDatabase();
-        String[] rowDetails = {"BSSID", "SSID"};
+        String[] rowDetails = {"ID", "BSSID", "SSID", "Freq"};
         Cursor cursor = db.query(WAP_TABLE_NAME, rowDetails, null, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
@@ -230,18 +173,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-   /* public void deleteMovie(String name){
-        movieDatabase=getWritableDatabase();
-        movieDatabase.delete("movie", "name='" + name + "'", null);
-        movieDatabase.close();
-    }
-    public void updateMovie(String oldName,String name,String desc){
-        movieDatabase=getWritableDatabase();
-        ContentValues rows=new ContentValues();
-        rows.put("name",name);
-        rows.put("description",desc);
-        movieDatabase.update("movie",rows,"name like ?",new String[]{oldName});
-        movieDatabase.close();
-    }*/
+    public void exportTheDataSet() throws IOException {
 
+        File root = new File(Environment.getExternalStorageDirectory(), "Datasets");
+        if (!root.exists()) {
+            root.mkdirs();
+        }
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+        String TimeStampDB = sdf.format(cal.getTime());
+
+        SQLiteDatabase db;
+        try {
+
+            File gpxfile = new File(root, TimeStampDB + ".csv");
+            gpxfile.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(gpxfile);
+            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            myOutWriter.append("F0;F1;Class");
+            myOutWriter.append("\n");
+
+            db = this.getWritableDatabase();
+            String[] rowDetails = {"F0", "F1", "Class"};
+            Cursor c = db.query("Dataset", rowDetails, null, null, null, null, null);
+
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        myOutWriter.append(c.getString(0) + ";" + c.getString(1) + ";" + c.getString(2));
+                        myOutWriter.append("\n");
+                    }
+
+                    while (c.moveToNext());
+                }
+
+                c.close();
+                myOutWriter.close();
+                fOut.close();
+
+            }
+
+            db.close();
+
+        } catch (SQLiteException se) {
+            Log.e(getClass().getSimpleName(), "Could not create or Open the database");
+        }
+
+    }
 }

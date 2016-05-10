@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class WAP extends AppCompatActivity {
 
     WifiManager mainWifi;
     WifiReceiver receiverWifi;
+    List<ScanResult> wifiList;
+
 
     ListView lv;
     ArrayAdapter<String> arrayAdapter;
@@ -41,7 +44,8 @@ public class WAP extends AppCompatActivity {
 
         Button scanBtn = (Button) findViewById(R.id.scanBtn);
 
-        arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+        lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_multiple_choice);
         lv.setAdapter(arrayAdapter);
 
         //TODO run this in another thread
@@ -62,7 +66,6 @@ public class WAP extends AppCompatActivity {
         scanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Check for wifi is disabled
                 if (mainWifi.isWifiEnabled() == false) {
                     // If wifi disabled then enable it
                     Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled",
@@ -73,8 +76,6 @@ public class WAP extends AppCompatActivity {
 
                 // wifi scaned value broadcast receiver
                 receiverWifi = new WifiReceiver();
-
-                //TODO send items to fill when wifichanged
 
                 // Register broadcast receiver
                 // Broacast receiver will automatically call when number of wifi connections changed
@@ -88,6 +89,19 @@ public class WAP extends AppCompatActivity {
 
 
     }
+
+    class WifiReceiver extends BroadcastReceiver {
+        // This method call when number of wifi connections changed
+        public void onReceive(Context c, Intent intent) {
+            wifiList = mainWifi.getScanResults();
+
+            for (int i = 0; i < wifiList.size(); i++) {
+                arrayAdapter.add(wifiList.get(i).SSID);
+            }
+
+        }
+    }
+
 
 
 }

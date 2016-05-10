@@ -9,6 +9,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
 
@@ -41,7 +43,7 @@ public class Settings extends AppCompatActivity {
 
         db = new DatabaseHelper(getApplicationContext());
         placesSpinner = (Spinner) findViewById(R.id.placesSpinner);
-
+        loadSpinnerData();
 
 
 /*
@@ -75,7 +77,7 @@ public class Settings extends AppCompatActivity {
         //TODO send items to fill when wifichanged
 
 
-        ListView lv = (ListView) findViewById(R.id.listView);
+        final ListView lv = (ListView) findViewById(R.id.listView);
         // lv.setItemsCanFocus(false);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_multiple_choice);
@@ -147,6 +149,40 @@ public class Settings extends AppCompatActivity {
         });
 
 
+        Button createBtn = (Button) findViewById(R.id.createBtn);
+        createBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<Integer> featuresIDs = new ArrayList<Integer>();
+                SparseBooleanArray checked = lv.getCheckedItemPositions();
+
+                for (int i = 0; i < lv.getAdapter().getCount(); i++) {
+                    if (checked.get(i)) {
+                        String name = arrayAdapter.getItem(i).toString();
+                        int pos = 5;
+                        featuresIDs.add(pos);
+                    }
+                }
+                db.createDataSetTable(featuresIDs);
+            }
+        });
+
+
+
+    }
+
+    private void loadSpinnerData() {
+        // Spinner Drop down elements
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
+        placesSpinner.setAdapter(dataAdapter);
+
+        final Cursor cursor = db.fetchAllPlaces();
+        while (!cursor.isAfterLast()) {
+            dataAdapter.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+
     }
 
     class WifiReceiver extends BroadcastReceiver {
@@ -177,21 +213,4 @@ public class Settings extends AppCompatActivity {
             }
         }
     }
-
-    /*private void loadSpinnerData() {
-        // Spinner Drop down elements
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
-
-        final Cursor cursor = db.fetchAllPlaces();
-        while (!cursor.isAfterLast()) {
-            dataAdapter.add(cursor.getString(0));
-            cursor.moveToNext();
-        }
-        // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // attaching data adapter to spinner
-        placesSpinner.setAdapter(dataAdapter);
-    }*/
 }

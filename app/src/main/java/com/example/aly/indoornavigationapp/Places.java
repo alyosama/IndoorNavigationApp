@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -32,12 +33,13 @@ public class Places extends AppCompatActivity {
         final DatabaseHelper helper = new DatabaseHelper(this);
         count = 0;
 
-        helper.clearDatabase();
+        //helper.clearDatabase();
 
         final ImageView map = (ImageView) findViewById(R.id.map);
         final ImageView cross = (ImageView) findViewById(R.id.cross);
         Button doneBtn = (Button) findViewById(R.id.addBtn);
 
+        final EditText placeTxt = (EditText) findViewById(R.id.namePlaceTxt);
         Toast.makeText(Places.this, "press the rooms in the order they're printed to define the rooms in the correct order please", Toast.LENGTH_SHORT).show();
 
         doneBtn.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +69,7 @@ public class Places extends AppCompatActivity {
 
                 //keyLocations.put(++count, viewCoords);
 
-                helper.addPlace("agkahkg", ++count, viewCoords);
+                helper.addPlace(placeTxt.getText().toString(), ++count, viewCoords);
                 Toast.makeText(Places.this, viewCoords[0] + "," + viewCoords[1] + " added", Toast.LENGTH_SHORT).show();
                 return false;
             }

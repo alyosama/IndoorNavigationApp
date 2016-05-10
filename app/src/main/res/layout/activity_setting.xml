@@ -22,8 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView6"
-        android:entries="@array/places_names" />
+        android:layout_below="@+id/textView6" />
 
     <TextView
         android:id="@+id/textView4"
@@ -87,5 +86,13 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/exportBtn"
         android:text="Places Con" />
+
+    <Button
+        android:id="@+id/createBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/recordBtn"
+        android:layout_toStartOf="@+id/recordBtn"
+        android:text="Create" />
 
 </RelativeLayout>
