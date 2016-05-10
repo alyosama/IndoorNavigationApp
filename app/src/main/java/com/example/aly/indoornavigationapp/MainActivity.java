@@ -26,9 +26,9 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     Button findPathBtn;
-    Spinner places;
+    Spinner placesSpinner;
     DatabaseHelper helper;
-    List<String> list;
+    ArrayAdapter<String> dataAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         findPathBtn = (Button)findViewById(R.id.pathBtn);
-        places = (Spinner) findViewById(R.id.spinner);
-        list = new ArrayList<String>();
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item,list);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        places.setAdapter(dataAdapter);
+        placesSpinner = (Spinner) findViewById(R.id.spinner);
+        loadSpinnerData();
 
         findPathBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,13 +54,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 handler.postDelayed(this,2000);
                 getLocation();
-                Cursor cursor = helper.fetchAllPlaces();
-                if(cursor != null) {
-                    while (!cursor.isAfterLast()) {
-                        list.add(cursor.getString(0));
-                        cursor.moveToNext();
-                    }
-                }
+                //TODO Mark this Location
             }
         };
         runnable.run();
@@ -75,7 +66,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void findPath(){
-        String destination = String.valueOf(places.getSelectedItem());
+        String destination = String.valueOf(placesSpinner.getSelectedItem());
+    }
+
+    private void loadSpinnerData() {
+        // Spinner Drop down elements
+        // Creating adapter for spinner
+        dataAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        placesSpinner.setAdapter(dataAdapter);
+
+        final Cursor cursor = helper.fetchAllPlaces();
+        if (cursor != null) {
+            while (!cursor.isAfterLast()) {
+                dataAdapter.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+        }
     }
 
     @Override
