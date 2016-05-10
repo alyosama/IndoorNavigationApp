@@ -9,6 +9,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Handler;
@@ -212,26 +214,34 @@ public class Settings extends AppCompatActivity {
         // This method call when number of wifi connections changed
         public void onReceive(Context c, Intent intent) {
             wifiList = mainWifi.getScanResults();
-                //TODO be dynamic by selecting WIFI AccessPoints from list  view
+            addFootPrint();
+
+        }
+
+
+        //TODO This Function Need to be Fixed
+        private void addFootPrint() {
+            //TODO be dynamic by selecting WIFI AccessPoints from list  view
             String placeName = (String) placesSpinner.getSelectedItem();
             int place = db.getPlaceNumber(placeName);
             //TODO Fix these Bugs
-            int[] x = new int[featuresIDs.size()];
-            // int[] x=new int[2];
+            HashMap x = new HashMap();
             //TODO Optimize
 
-                for (ScanResult result : wifiList) {
+            String[] Columns = db.getDataSetColumns();
 
-                    for (Integer id : featuresIDs) {
-                        if (id == db.getWAPID(result.SSID)) {
-                            x[id] = result.level;
-                        }
+            for (int j = 0; j < Columns.length - 1; j++) {
+                for (ScanResult result : wifiList) {
+                    int id = Integer.parseInt(Columns[j].substring(1));
+                    Log.d("Value ", "Id Parsed is " + String.valueOf(id));
+                    if (id == db.getWAPID(result.SSID)) {
+                        x.put(id, result.level);
                     }
 
                 }
-                db.addFingerPrint(place, x);
+            }
+            db.addFingerPrint(place, x);
             Toast.makeText(getApplicationContext(), "Footprint Added " + placeName, Toast.LENGTH_SHORT).show();
-
 
         }
     }

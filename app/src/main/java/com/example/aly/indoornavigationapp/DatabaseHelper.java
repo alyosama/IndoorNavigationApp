@@ -16,7 +16,10 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by aly on 06/05/16.
@@ -67,12 +70,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param place    is a class Y
      * @param features is a X vector
      */
-    public void addFingerPrint(int place, int[] features) {
+    public void addFingerPrint(int place, HashMap<Integer, Integer> features) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("Class", place); // Contact Name
-        for (int i = 0; i < features.length; i++) {
-            values.put("F" + String.valueOf(i), features[i]);
+        for (Map.Entry<Integer, Integer> entry : features.entrySet()) {
+            values.put("F" + entry.getKey(), entry.getValue());
         }
         // Inserting Row
         db.insert(DATASET_TABLE_NAME, null, values);
@@ -168,6 +171,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int id;
         Cursor c = db.rawQuery("Select ID from WAP where SSID like ?", conditions);
         c.moveToFirst();
+        Log.d("Value", "Id is :" + String.valueOf(c.getInt(0)));
         id = c.getInt(0);
         c.close();
         db.close();
@@ -185,6 +189,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public String[] getDataSetColumns() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db = this.getWritableDatabase();
+        Cursor dbCursor = db.query(DATASET_TABLE_NAME, null, null, null, null, null, null);
+        String[] Columns = dbCursor.getColumnNames();
+        dbCursor.close();
+        db.close();
+        return Columns;
+
+    }
     public void exportTheDataSet() throws IOException {
 
         File root = new File(Environment.getExternalStorageDirectory(), "Datasets");
@@ -203,17 +217,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             gpxfile.createNewFile();
             FileOutputStream fOut = new FileOutputStream(gpxfile);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append("F0;F1;Class");
-            myOutWriter.append("\n");
+
 
             db = this.getWritableDatabase();
-            String[] rowDetails = {"F0", "F1", "Class"};
-            Cursor c = db.query("Dataset", rowDetails, null, null, null, null, null);
+
+            String[] rowDetails = getDataSetColumns();
+
+            for (int j = 0; j < rowDetails.length; j++) {
+                myOutWriter.append(rowDetails[j] + ";");
+            }
+            myOutWriter.append("\n");
+
+            Cursor c = db.query(DATASET_TABLE_NAME, rowDetails, null, null, null, null, null);
 
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
-                        myOutWriter.append(c.getString(0) + ";" + c.getString(1) + ";" + c.getString(2));
+                        for (int j = 0; j < rowDetails.length; j++) {
+                            myOutWriter.append(c.getString(j) + ";");
+                        }
                         myOutWriter.append("\n");
                     }
 
