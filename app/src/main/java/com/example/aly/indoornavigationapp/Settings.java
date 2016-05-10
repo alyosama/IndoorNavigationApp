@@ -22,6 +22,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Handler;
 
 import android.os.HandlerThread;
@@ -33,8 +34,18 @@ public class Settings extends AppCompatActivity {
     Spinner placesSpinner;
     List<ScanResult> wifiList;
     boolean isRecord = false;
+    ArrayList<Integer> featuresIDs;
+    ArrayAdapter<String> dataAdapter;
     private ArrayAdapter<String> arrayAdapter;
-    private TextView debugView;
+    private ListView lv;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadListViewData();
+        loadSpinnerData();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,32 +88,17 @@ public class Settings extends AppCompatActivity {
         //TODO send items to fill when wifichanged
 
 
-        final ListView lv = (ListView) findViewById(R.id.listView);
+        lv = (ListView) findViewById(R.id.listView);
         // lv.setItemsCanFocus(false);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_multiple_choice);
-        lv.setAdapter(arrayAdapter);
+        loadListViewData();
+
 
         Button recordButton = (Button) findViewById(R.id.recordBtn);
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isRecord = true;
                 //TODO Capture Record every 1 SEC
-                int place = placesSpinner.getSelectedItemPosition();
-                // receiverWifi.setPlace(place);
-                mainWifi.startScan();
-            }
-        });
-
-        debugView = (TextView) findViewById(R.id.textView4);
-        Button configureButton = (Button) findViewById(R.id.confBtn);
-
-        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-
-        configureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 if (mainWifi.isWifiEnabled() == false) {
                     // If wifi disabled then enable it
                     Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled",
@@ -111,19 +107,29 @@ public class Settings extends AppCompatActivity {
                     mainWifi.setWifiEnabled(true);
                 }
 
-                isRecord = false;
                 // wifi scaned value broadcast receiver
                 receiverWifi = new WifiReceiver();
 
                 // Register broadcast receiver
                 // Broacast receiver will automatically call when number of wifi connections changed
                 registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-                arrayAdapter.clear();
                 mainWifi.startScan();
-                debugView.setText("Starting Scan...");
+            }
+        });
+
+        Button configureButton = (Button) findViewById(R.id.confBtn);
+
+        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        configureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Settings.this, WAP.class);
+                startActivity(i);
 
             }
         });
+
 
         Button exportButton = (Button) findViewById(R.id.exportBtn);
         exportButton.setOnClickListener(new View.OnClickListener() {
@@ -153,17 +159,18 @@ public class Settings extends AppCompatActivity {
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<Integer> featuresIDs = new ArrayList<Integer>();
+                featuresIDs = new ArrayList<Integer>();
                 SparseBooleanArray checked = lv.getCheckedItemPositions();
 
                 for (int i = 0; i < lv.getAdapter().getCount(); i++) {
                     if (checked.get(i)) {
                         String name = arrayAdapter.getItem(i).toString();
-                        int pos = 5;
+                        int pos = db.getWAPID(name);
                         featuresIDs.add(pos);
                     }
                 }
                 db.createDataSetTable(featuresIDs);
+                Toast.makeText(getApplicationContext(), "Database Created", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -174,13 +181,29 @@ public class Settings extends AppCompatActivity {
     private void loadSpinnerData() {
         // Spinner Drop down elements
         // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
+        dataAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
         placesSpinner.setAdapter(dataAdapter);
 
         final Cursor cursor = db.fetchAllPlaces();
-        while (!cursor.isAfterLast()) {
-            dataAdapter.add(cursor.getString(0));
-            cursor.moveToNext();
+        if (cursor != null) {
+            while (!cursor.isAfterLast()) {
+                dataAdapter.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+        }
+    }
+
+    private void loadListViewData() {
+        arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_multiple_choice);
+        lv.setAdapter(arrayAdapter);
+
+
+        final Cursor cursor = db.fetchAllWAPS();
+        if (cursor != null) {
+            while (!cursor.isAfterLast()) {
+                arrayAdapter.add(cursor.getString(2));
+                cursor.moveToNext();
+            }
         }
 
     }
@@ -189,28 +212,27 @@ public class Settings extends AppCompatActivity {
         // This method call when number of wifi connections changed
         public void onReceive(Context c, Intent intent) {
             wifiList = mainWifi.getScanResults();
-            if (isRecord) {
-
                 //TODO be dynamic by selecting WIFI AccessPoints from list  view
-                int place = placesSpinner.getSelectedItemPosition();
-                int[] x = new int[2];
+            String placeName = (String) placesSpinner.getSelectedItem();
+            int place = db.getPlaceNumber(placeName);
+            //TODO Fix these Bugs
+            int[] x = new int[featuresIDs.size()];
+            // int[] x=new int[2];
+            //TODO Optimize
+
                 for (ScanResult result : wifiList) {
-                    if (result.SSID.equals("Osama")) { //OSAMA
-                        x[0] = result.level;
-                    } else if (result.SSID.equals("TE-Data")) { //TE-DATA
-                        x[1] = result.level;
+
+                    for (Integer id : featuresIDs) {
+                        if (id == db.getWAPID(result.SSID)) {
+                            x[id] = result.level;
+                        }
                     }
 
                 }
                 db.addFingerPrint(place, x);
-                Toast.makeText(getApplicationContext(), "Footprint Added", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Footprint Added " + placeName, Toast.LENGTH_SHORT).show();
 
-            } else {
-                for (int i = 0; i < wifiList.size(); i++) {
-                    arrayAdapter.add(wifiList.get(i).SSID);
-                }
-                debugView.setText("WAP found is" + wifiList.size());
-            }
+
         }
     }
 }

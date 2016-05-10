@@ -9,6 +9,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -88,7 +89,29 @@ public class WAP extends AppCompatActivity {
         });
 
 
+        Button addWAPs = (Button) findViewById(R.id.addWapBtn);
+        addWAPs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SparseBooleanArray checked = lv.getCheckedItemPositions();
+
+                for (int i = 0; i < lv.getAdapter().getCount(); i++) {
+                    if (checked.get(i)) {
+                        String name = arrayAdapter.getItem(i).toString();
+                        for (ScanResult result : wifiList) {
+                            if (result.SSID.equals(name)) {
+                                db.addWAP(result.BSSID, result.SSID, result.frequency);
+                            }
+                        }
+                    }
+                }
+                Toast.makeText(getApplicationContext(), "WAPS Added", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
+
 
     class WifiReceiver extends BroadcastReceiver {
         // This method call when number of wifi connections changed
@@ -97,6 +120,7 @@ public class WAP extends AppCompatActivity {
 
             for (int i = 0; i < wifiList.size(); i++) {
                 arrayAdapter.add(wifiList.get(i).SSID);
+
             }
 
         }

@@ -1,7 +1,5 @@
 package com.example.aly.indoornavigationapp;
 
-import android.content.Intent;
-import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,11 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import java.util.HashMap;
-import java.util.Hashtable;
 
 public class Places extends AppCompatActivity {
 
@@ -27,7 +21,7 @@ public class Places extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_places);
 
         //final HashMap<Integer, float[]> keyLocations = new HashMap<Integer, float[]>();
         final DatabaseHelper helper = new DatabaseHelper(this);
@@ -37,40 +31,42 @@ public class Places extends AppCompatActivity {
 
         final ImageView map = (ImageView) findViewById(R.id.map);
         final ImageView cross = (ImageView) findViewById(R.id.cross);
-        Button doneBtn = (Button) findViewById(R.id.addBtn);
+        Button addPlaceBtn = (Button) findViewById(R.id.addPlaceBtn);
 
         final EditText placeTxt = (EditText) findViewById(R.id.namePlaceTxt);
         Toast.makeText(Places.this, "press the rooms in the order they're printed to define the rooms in the correct order please", Toast.LENGTH_SHORT).show();
 
-        doneBtn.setOnClickListener(new View.OnClickListener() {
+
+        addPlaceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //create a sqlite database to save the coordinates
-                Cursor cursor = helper.fetchAllPlaces();
-                while (!cursor.isAfterLast()) {
-                    Log.v("x center", String.valueOf(cursor.getFloat(2)));
-                    Log.v("y center", String.valueOf(cursor.getFloat(3)));
-                    cursor.moveToNext();
-                }
-                //Log.v("main", keyLocations.toString());
+            public void onClick(View v) {
+                helper.addPlace(placeTxt.getText().toString(), ++count, viewCoords);
+                Toast.makeText(Places.this, viewCoords[0] + "," + viewCoords[1] + " added", Toast.LENGTH_SHORT).show();
+
             }
         });
+        final int[] mapCoords = new int[2];
+        map.getLocationOnScreen(mapCoords);
 
         map.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
+
+
                 Log.v(" x = ", event.getX() + "");
                 Log.v("y = ", event.getY() + "");
-                viewCoords[0] = event.getX();
-                viewCoords[1] = event.getY();
+                int touchX = (int) event.getX();
+                int touchY = (int) event.getY();
+
+                viewCoords[0] = touchX - mapCoords[0];
+                viewCoords[1] = touchY - mapCoords[1];
 
                 cross.setX(viewCoords[0]);
                 cross.setY(viewCoords[1]);
 
+                cross.setVisibility(View.VISIBLE);
                 //keyLocations.put(++count, viewCoords);
 
-                helper.addPlace(placeTxt.getText().toString(), ++count, viewCoords);
-                Toast.makeText(Places.this, viewCoords[0] + "," + viewCoords[1] + " added", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });

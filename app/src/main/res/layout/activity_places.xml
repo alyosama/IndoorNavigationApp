@@ -29,7 +29,7 @@
         android:id="@+id/map"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/addBtn"
+        android:layout_above="@+id/addPlaceBtn"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/namePlaceTxt"
         android:src="@drawable/floor_map" />
@@ -44,7 +44,7 @@
         android:visibility="gone" />
 
     <Button
-        android:id="@+id/addBtn"
+        android:id="@+id/addPlaceBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

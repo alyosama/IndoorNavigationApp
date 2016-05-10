@@ -24,7 +24,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "indoor.db";
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 5;
     public static final String WAP_TABLE_NAME = "WAP";
     public static final String PLACES_TABLE_NAME = "Places";
     private static final String DATASET_TABLE_NAME = "Dataset";
@@ -40,7 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, BSSID text not null, SSID text not null, Freq INTEGER);";
 
         String sql_places = "CREATE TABLE " + PLACES_TABLE_NAME +
-                " ( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, Name text not null, Number INTEGER not null" +
+                " ( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, Name text not null, Number INTEGER not null," +
                 " X FLOAT not null, Y FLOAT not null );";
 
         db.execSQL(sql_wap);
@@ -52,6 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void createDataSetTable(ArrayList<Integer> featuresIDs) {
         SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + DATASET_TABLE_NAME);
         String DATASET_TABLE_SQL = "CREATE TABLE " + DATASET_TABLE_NAME + " ( F" + featuresIDs.get(0) + " INTEGER";
         for (int i = 1; i < featuresIDs.size(); i++) {
             DATASET_TABLE_SQL += ", F" + featuresIDs.get(i) + " INTEGER";
@@ -119,6 +120,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] conditions = {String.valueOf(number)};
         float[] coord = new float[2];
         Cursor c = db.rawQuery("Select X,Y from Places where Number like ?", conditions);
+        c.moveToFirst();
+
+
         coord[0] = c.getFloat(0);
         coord[1] = c.getFloat(1);
 
@@ -126,6 +130,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return coord;
     }
 
+    public int getPlaceNumber(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] conditions = {name};
+        int id;
+        Cursor c = db.rawQuery("Select Number from Places where Name like ?", conditions);
+        c.moveToFirst();
+        id = c.getInt(0);
+
+        db.close();
+        return id;
+    }
     public Cursor fetchAllPlaces() {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] rowDetails = {"Name", "Number", "X", "Y"};
@@ -136,7 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public void addWAP(int id, String bssid, String ssid, int freq) {
+    public void addWAP(String bssid, String ssid, int freq) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("BSSID", bssid); // Contact Name
@@ -148,17 +163,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getWAPID(String ssid) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "select ID from " + WAP_TABLE_NAME + " where SSID=\"" + ssid + "\"";
-        Cursor cursor = db.rawQuery(query, null);
-
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] conditions = {ssid};
         int id;
-        if (cursor != null && cursor.getCount() > 0) {
-            id = cursor.getInt(0);
-        } else {
-            id = -1;
-        }
-        cursor.close();
+        Cursor c = db.rawQuery("Select ID from WAP where SSID like ?", conditions);
+        c.moveToFirst();
+        id = c.getInt(0);
+        c.close();
+        db.close();
         return id;
     }
 

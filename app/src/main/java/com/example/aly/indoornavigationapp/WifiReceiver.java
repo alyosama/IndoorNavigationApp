@@ -72,13 +72,14 @@ public class WifiReceiver extends BroadcastReceiver {
 
     }
 
-    public void addWAPsToDatabase(DatabaseHelper db) {
-        for (int i = 0; i < wifiList.size(); i++) {
-            db.addWAP(wifiList.get(i).BSSID, wifiList.get(i).SSID);
+    /*
+        public void addWAPsToDatabase(DatabaseHelper db) {
+            for (int i = 0; i < wifiList.size(); i++) {
+                db.addWAP(wifiList.get(i).BSSID, wifiList.get(i).SSID);
+            }
+
         }
-
-    }
-
+    */
     public void fillArrayAdapter() {
         for (int i = 0; i < wifiList.size(); i++) {
             arrayAdapterLV.add(wifiList.get(i).SSID);
