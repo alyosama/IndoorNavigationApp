@@ -56,11 +56,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void createDataSetTable(ArrayList<Integer> featuresIDs) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + DATASET_TABLE_NAME);
-        String DATASET_TABLE_SQL = "CREATE TABLE " + DATASET_TABLE_NAME + " ( F" + featuresIDs.get(0) + " INTEGER";
+        String DATASET_TABLE_SQL = "CREATE TABLE " + DATASET_TABLE_NAME + " ( F" + featuresIDs.get(0) + " INTEGER DEFAULT 0";
         for (int i = 1; i < featuresIDs.size(); i++) {
-            DATASET_TABLE_SQL += ", F" + featuresIDs.get(i) + " INTEGER";
+            DATASET_TABLE_SQL += ", F" + featuresIDs.get(i) + " INTEGER DEFAULT 0";
         }
-        DATASET_TABLE_SQL += ");";
+        DATASET_TABLE_SQL += ", Class Integer not null);";
 
         db.execSQL(DATASET_TABLE_SQL);
         db.close();
@@ -79,6 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         // Inserting Row
         db.insert(DATASET_TABLE_NAME, null, values);
+        db.close();
     }
 
     @Override
@@ -93,13 +94,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void voidDropPlaces() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + PLACES_TABLE_NAME);
-
+        db.close();
     }
 
     public void voidDropWAP() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + WAP_TABLE_NAME);
-
+        db.close();
     }
 
     public void clearDatabase() {
@@ -116,6 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Y", viewCoords[1]);
         // Inserting Row
         db.insert(PLACES_TABLE_NAME, null, values);
+        db.close();
     }
 
     public float[] getPlaceLocation(int number) {
@@ -141,6 +143,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         c.moveToFirst();
         id = c.getInt(0);
 
+        db.close();
+        return id;
+    }
+
+    public int getPlaceID(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] conditions = {name};
+        int id;
+        Cursor c = db.rawQuery("Select ID from Places where Name like ?", conditions);
+        c.moveToFirst();
+        id = c.getInt(0);
         db.close();
         return id;
     }
@@ -178,8 +191,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public String getWAPSSID(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] conditions = {String.valueOf(id)};
+        String ssid;
+        Cursor c = db.rawQuery("Select SSID from WAP where ID like ?", conditions);
+        c.moveToFirst();
+        ssid = c.getString(0);
+        c.close();
+        db.close();
+        return ssid;
+    }
     public Cursor fetchAllWAPS() {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         String[] rowDetails = {"ID", "BSSID", "SSID", "Freq"};
         Cursor cursor = db.query(WAP_TABLE_NAME, rowDetails, null, null, null, null, null);
         if (cursor != null)
@@ -191,15 +215,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String[] getDataSetColumns() {
         SQLiteDatabase db = this.getReadableDatabase();
-        db = this.getWritableDatabase();
         Cursor dbCursor = db.query(DATASET_TABLE_NAME, null, null, null, null, null, null);
         String[] Columns = dbCursor.getColumnNames();
         dbCursor.close();
-        db.close();
         return Columns;
 
     }
     public void exportTheDataSet() throws IOException {
+        SQLiteDatabase db = this.getReadableDatabase();
 
         File root = new File(Environment.getExternalStorageDirectory(), "Datasets");
         if (!root.exists()) {
@@ -210,7 +233,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
         String TimeStampDB = sdf.format(cal.getTime());
 
-        SQLiteDatabase db;
         try {
 
             File gpxfile = new File(root, TimeStampDB + ".csv");
@@ -219,14 +241,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
 
 
-            db = this.getWritableDatabase();
 
             String[] rowDetails = getDataSetColumns();
-
             for (int j = 0; j < rowDetails.length; j++) {
                 myOutWriter.append(rowDetails[j] + ";");
             }
             myOutWriter.append("\n");
+
 
             Cursor c = db.query(DATASET_TABLE_NAME, rowDetails, null, null, null, null, null);
 
@@ -248,10 +269,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             }
 
-            db.close();
 
         } catch (SQLiteException se) {
             Log.e(getClass().getSimpleName(), "Could not create or Open the database");
+        } finally {
+            db.close();
         }
 
     }

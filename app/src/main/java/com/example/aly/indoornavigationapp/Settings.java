@@ -58,37 +58,7 @@ public class Settings extends AppCompatActivity {
         placesSpinner = (Spinner) findViewById(R.id.placesSpinner);
         loadSpinnerData();
 
-
-/*
-        Button wapBtn = (Button) findViewById(R.id.wapBtn);
-        wapBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Settings.this, WAP.class);
-                startActivity(intent);
-            }
-        });
-
-        Button placesBtn = (Button) findViewById(R.id.placesBtn);
-        placesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Settings.this, Places.class);
-                startActivity(intent);
-            }
-        });
-
-        Button configureButton = (Button) findViewById(R.id.configureBtn);
-        configureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                db.createDataSetTable();
-            }
-        });
-*/
-
         //TODO send items to fill when wifichanged
-
 
         lv = (ListView) findViewById(R.id.listView);
         // lv.setItemsCanFocus(false);
@@ -221,25 +191,24 @@ public class Settings extends AppCompatActivity {
 
         //TODO This Function Need to be Fixed
         private void addFootPrint() {
-            //TODO be dynamic by selecting WIFI AccessPoints from list  view
             String placeName = (String) placesSpinner.getSelectedItem();
-            int place = db.getPlaceNumber(placeName);
-            //TODO Fix these Bugs
-            HashMap x = new HashMap();
-            //TODO Optimize
+            int place = db.getPlaceID(placeName);
 
+            HashMap x = new HashMap();
             String[] Columns = db.getDataSetColumns();
 
+            HashMap map = new HashMap();
             for (int j = 0; j < Columns.length - 1; j++) {
-                for (ScanResult result : wifiList) {
-                    int id = Integer.parseInt(Columns[j].substring(1));
-                    Log.d("Value ", "Id Parsed is " + String.valueOf(id));
-                    if (id == db.getWAPID(result.SSID)) {
-                        x.put(id, result.level);
-                    }
-
+                int id = Integer.parseInt(Columns[j].substring(1));
+                map.put(db.getWAPSSID(id), id);
+            }
+            for (ScanResult result : wifiList) {
+                if (map.containsKey(result.SSID)) {
+                    x.put(map.get(result.SSID), result.level);
                 }
             }
+
+
             db.addFingerPrint(place, x);
             Toast.makeText(getApplicationContext(), "Footprint Added " + placeName, Toast.LENGTH_SHORT).show();
 

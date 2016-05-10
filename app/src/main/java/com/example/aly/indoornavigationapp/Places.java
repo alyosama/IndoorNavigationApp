@@ -25,7 +25,6 @@ public class Places extends AppCompatActivity {
 
         //final HashMap<Integer, float[]> keyLocations = new HashMap<Integer, float[]>();
         final DatabaseHelper helper = new DatabaseHelper(this);
-        count = 0;
 
         //helper.clearDatabase();
 
