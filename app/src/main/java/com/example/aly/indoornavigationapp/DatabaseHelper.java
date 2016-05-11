@@ -157,6 +157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return id;
     }
+
     public Cursor fetchAllPlaces() {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] rowDetails = {"Name", "Number", "X", "Y"};
@@ -202,6 +203,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return ssid;
     }
+
     public Cursor fetchAllWAPS() {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] rowDetails = {"ID", "BSSID", "SSID", "Freq"};
@@ -221,6 +223,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return Columns;
 
     }
+
     public void exportTheDataSet() throws IOException {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -239,7 +242,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             gpxfile.createNewFile();
             FileOutputStream fOut = new FileOutputStream(gpxfile);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-
 
 
             String[] rowDetails = getDataSetColumns();

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         helper = new DatabaseHelper(this);
 
 
-        findPathBtn = (Button)findViewById(R.id.pathBtn);
+        findPathBtn = (Button) findViewById(R.id.pathBtn);
         placesSpinner = (Spinner) findViewById(R.id.spinner);
         loadSpinnerData();
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                handler.postDelayed(this,2000);
+                handler.postDelayed(this, 2000);
                 getLocation();
                 //TODO Mark this Location
             }
@@ -62,10 +62,10 @@ public class MainActivity extends AppCompatActivity {
 
     public int getLocation() {
         Random n = new Random();
-        return n.nextInt(15)+1;
+        return n.nextInt(15) + 1;
     }
 
-    public void findPath(){
+    public void findPath() {
         String destination = String.valueOf(placesSpinner.getSelectedItem());
     }
 
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.setting_menu, menu);
         return true;
     }

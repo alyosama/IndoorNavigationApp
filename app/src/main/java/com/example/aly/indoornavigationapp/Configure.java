@@ -82,18 +82,8 @@ public class Configure extends AppCompatActivity {
             }
         });
 
-        Button configureButton = (Button) findViewById(R.id.confBtn);
 
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-
-        configureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Configure.this, WAP.class);
-                startActivity(i);
-
-            }
-        });
 
 
         Button exportButton = (Button) findViewById(R.id.exportBtn);
@@ -107,15 +97,6 @@ public class Configure extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-            }
-        });
-
-        Button placeConfButton = (Button) findViewById(R.id.placesConf);
-        placeConfButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Configure.this, Places.class);
-                startActivity(i);
             }
         });
 
@@ -138,7 +119,6 @@ public class Configure extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Database Created", Toast.LENGTH_SHORT).show();
             }
         });
-
 
 
     }
