@@ -1,17 +1,21 @@
 package com.example.aly.indoornavigationapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 public class Places extends AppCompatActivity {
-
     //problems : no way to find what order will it be, so how to save in a known pattern
     // wrong values come out of database, must fix that
 
@@ -21,16 +25,15 @@ public class Places extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_places);
+        setContentView(R.layout.activity_places1);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        //final HashMap<Integer, float[]> keyLocations = new HashMap<Integer, float[]>();
         final DatabaseHelper helper = new DatabaseHelper(this);
-
-        //helper.clearDatabase();
 
         final ImageView map = (ImageView) findViewById(R.id.map);
         final ImageView cross = (ImageView) findViewById(R.id.cross);
-        Button addPlaceBtn = (Button) findViewById(R.id.addPlaceBtn);
+        FloatingActionButton addPlaceBtn = (FloatingActionButton) findViewById(R.id.addLocationBtn);
 
         final EditText placeTxt = (EditText) findViewById(R.id.namePlaceTxt);
         Toast.makeText(Places.this, "press the rooms in the order they're printed to define the rooms in the correct order please", Toast.LENGTH_SHORT).show();
@@ -64,10 +67,28 @@ public class Places extends AppCompatActivity {
                 cross.setY(viewCoords[1]);
 
                 cross.setVisibility(View.VISIBLE);
-                //keyLocations.put(++count, viewCoords);
 
                 return false;
             }
         });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.view_locations_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent i = null;
+        switch (item.getItemId()) {
+            case R.id.view:
+                i = new Intent(this, Places.class);
+                startActivity(i);
+                return true;
+        }
+        return false;
     }
 }

@@ -6,4 +6,7 @@
         <item>Seminar Room 3</item>
         <item>Logic Lab</item>
     </string-array>
+    <string name="title_activity_add_place">AddPlace</string>
+    <string name="title_activity_main_map">MainMap</string>
+    <string name="title_activity_places1">Places</string>
 </resources>

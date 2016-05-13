@@ -1,31 +1,23 @@
 package com.example.aly.indoornavigationapp;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.os.Handler;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
-    Button findPathBtn;
+public class MainMap extends AppCompatActivity {
+    FloatingActionButton findPathBtn;
     Spinner placesSpinner;
     DatabaseHelper helper;
     ArrayAdapter<String> dataAdapter;
@@ -33,12 +25,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_map);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         helper = new DatabaseHelper(this);
 
 
-        findPathBtn = (Button) findViewById(R.id.pathBtn);
+        findPathBtn = (FloatingActionButton) findViewById(R.id.pathBtn);
         placesSpinner = (Spinner) findViewById(R.id.spinner);
         loadSpinnerData();
 
@@ -112,3 +106,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
+//Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//      .setAction("Action", null).show();
+
+
+
+
