@@ -2,6 +2,11 @@ package com.example.aly.indoornavigationapp;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import java.util.Random;
@@ -21,11 +27,13 @@ public class MainMap extends AppCompatActivity {
     Spinner placesSpinner;
     DatabaseHelper helper;
     ArrayAdapter<String> dataAdapter;
+    ImageView floorMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
+        floorMap = (ImageView) findViewById(R.id.map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -60,7 +68,26 @@ public class MainMap extends AppCompatActivity {
     }
 
     public void findPath() {
+
         String destination = String.valueOf(placesSpinner.getSelectedItem());
+        float sourceCoord[] = helper.getPlaceLocationByName("Room10");
+        float cooridor1[] = helper.getPlaceLocationByName("corridor1");
+        float destCoord[] = helper.getPlaceLocationByName(destination);
+        DrawLine(floorMap.getPivotX()+sourceCoord[0],floorMap.getPivotY()+sourceCoord[1] , floorMap.getPivotX()+cooridor1[0],floorMap.getPivotY()+sourceCoord[1], Color.RED);
+
+
+    }
+
+    private void DrawLine(float x, float y, float xend, float yend, int color) {
+
+        BitmapDrawable bmpDraw = (BitmapDrawable) floorMap.getDrawable();
+        Bitmap bmp = bmpDraw.getBitmap().copy(Bitmap.Config.RGB_565, true);
+        Canvas c = new Canvas(bmp);
+        Paint p = new Paint();
+        p.setColor(color);
+        c.drawLine(x, y, xend, yend, p);
+        floorMap.setImageBitmap(bmp);
+
     }
 
     private void loadSpinnerData() {

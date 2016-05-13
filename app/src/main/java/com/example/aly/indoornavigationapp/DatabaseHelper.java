@@ -135,6 +135,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return coord;
     }
 
+    public float[] getPlaceLocationByName(String roomName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] conditions = {String.valueOf(roomName)};
+        float[] coord = new float[2];
+        Cursor c = db.rawQuery("Select X,Y from Places where Name like ?", conditions);
+        c.moveToFirst();
+
+
+        coord[0] = c.getFloat(0);
+        coord[1] = c.getFloat(1);
+
+        db.close();
+        return coord;
+    }
+
     public int getPlaceNumber(String name) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] conditions = {name};
