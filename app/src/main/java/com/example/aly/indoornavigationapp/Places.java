@@ -39,10 +39,8 @@ public class Places extends AppCompatActivity {
         FloatingActionButton addPlaceBtn = (FloatingActionButton) findViewById(R.id.addLocationBtn);
 
         final EditText placeTxt = (EditText) findViewById(R.id.namePlaceTxt);
-        Toast.makeText(Places.this, "press the rooms in the order they're printed to define the rooms in the correct order please", Toast.LENGTH_SHORT).show();
-
-
-
+        final EditText roomNo = (EditText) findViewById(R.id.RoomNumberTxt);
+        //Toast.makeText(Places.this, "press the rooms in the order they're printed to define the rooms in the correct order please", Toast.LENGTH_SHORT).show();
         //Resize the marker
         ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) cross.getLayoutParams();
         params.width = 50;
@@ -52,7 +50,7 @@ public class Places extends AppCompatActivity {
         addPlaceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                helper.addPlace(placeTxt.getText().toString(), ++count, viewCoords);
+                helper.addPlace(placeTxt.getText().toString(),Integer.valueOf(roomNo.getText().toString()), viewCoords);
                 Toast.makeText(Places.this, viewCoords[0] + "," + viewCoords[1] + " added", Toast.LENGTH_SHORT).show();
             }
         });

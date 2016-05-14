@@ -126,16 +126,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         float[] coord = new float[2];
         Cursor c = db.rawQuery("Select X,Y from Places where Number like ?", conditions);
         c.moveToFirst();
-
-
+        if(c.getCount()!=0){
         coord[0] = c.getFloat(0);
-        coord[1] = c.getFloat(1);
-
+        coord[1] = c.getFloat(1);}
         db.close();
         return coord;
     }
-
-
 
     public float[] getPlaceLocationByName(String roomName) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -152,18 +148,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return coord;
     }
 
-    public float[] getPlaceLocationByID(String id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String[] conditions = {String.valueOf(id)};
-        float[] coord = new float[2];
-        Cursor c = db.rawQuery("Select X,Y from Places where ID like ?", conditions);
-        c.moveToFirst();
-        coord[0] = c.getFloat(0);
-        coord[1] = c.getFloat(1);
-        db.close();
-        return coord;
-    }
-
     public int getPlaceNumber(String name) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] conditions = {name};
@@ -174,6 +158,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.close();
         return id;
+    }
+    public  String getPlaceName(int id)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] conditions = {String.valueOf(id)};
+        String roomName;
+        Cursor c = db.rawQuery("Select Number from Places where Name like ?", conditions);
+        c.moveToFirst();
+        roomName = c.getString(0);
+
+        db.close();
+        return roomName;
     }
 
     public int getPlaceID(String name) {

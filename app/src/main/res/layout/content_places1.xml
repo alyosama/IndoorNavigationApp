@@ -11,22 +11,36 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.aly.indoornavigationapp.Places"
     tools:showIn="@layout/activity_places1">
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:id="@+id/lineartext">
     <EditText
         android:id="@+id/namePlaceTxt"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="Add New Place Name"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="15dp" />
+    <EditText
+        android:id="@+id/RoomNumberTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Add Room Number"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="15dp" />
+</LinearLayout>
+
 
     <ImageView
         android:id="@+id/map"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/namePlaceTxt"
+        android:layout_below="@+id/lineartext"
         android:src="@drawable/floor_map" />
 
     <ImageView

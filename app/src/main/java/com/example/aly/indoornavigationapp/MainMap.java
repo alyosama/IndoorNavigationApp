@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -31,6 +33,7 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.jar.Manifest;
 
 public class MainMap extends AppCompatActivity {
     WifiManager mainWifi;
@@ -43,6 +46,7 @@ public class MainMap extends AppCompatActivity {
     ArrayAdapter<String> dataAdapter;
     ImageView floorMap;
     CoordinatorLayout mainlayout;
+    Toolbar toolbar;
 
     public boolean isConfigured=false;
      ImageView cross;
@@ -51,9 +55,10 @@ public class MainMap extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
         floorMap = (ImageView) findViewById(R.id.map);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-         mainlayout = (CoordinatorLayout) findViewById(R.id.mainlayout);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mainlayout = (CoordinatorLayout) findViewById(R.id.mainlayout);
         setSupportActionBar(toolbar);
+        cross = (ImageView) findViewById(R.id.cross);
 
         helper = new DatabaseHelper(this);
 
@@ -62,7 +67,6 @@ public class MainMap extends AppCompatActivity {
 
         findPathBtn = (FloatingActionButton) findViewById(R.id.pathBtn);
         placesSpinner = (Spinner) findViewById(R.id.spinner);
-        cross = (ImageView) findViewById(R.id.cross);
 
         //Resize the marker
         ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) cross.getLayoutParams();
@@ -83,7 +87,6 @@ public class MainMap extends AppCompatActivity {
             public void run() {
                 handler.postDelayed(this, 2000);
                int location = getLocation();
-
                 markLocation(location);
 
             }
@@ -98,13 +101,15 @@ public class MainMap extends AppCompatActivity {
     }
 
     public void markLocation(int location){
-        float [] locationCoord= helper.getPlaceLocationByID(String.valueOf(location));
-        Toast.makeText(MainMap.this, locationCoord[0] + "," + locationCoord[1] + " mark coord", Toast.LENGTH_SHORT).show();
-        cross.setX(locationCoord[0]+floorMap.getX());
-        cross.setY(locationCoord[1]+floorMap.getY());
-//                cross.setX(locationCoord[0]);
-//                cross.setY(locationCoord[1]);
+        float locationCoord[]= helper.getPlaceLocation(location);
+
+        if(locationCoord.length !=0){
+            //Toast.makeText(MainMap.this, locationCoord[0] + "," + locationCoord[1] + " mark coord", Toast.LENGTH_SHORT).show();
+            cross.setX(locationCoord[0]+floorMap.getX()-cross.getWidth());
+            cross.setY(locationCoord[1]+toolbar.getHeight()-floorMap.getY());
+            Toast.makeText(MainMap.this,"Room: "+String.valueOf(location),Toast.LENGTH_SHORT).show();
         cross.setVisibility(View.VISIBLE);
+        }
     }
     public void runWifi(){
         if (mainWifi.isWifiEnabled() == false) {
@@ -122,6 +127,18 @@ public class MainMap extends AppCompatActivity {
         registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         mainWifi.startScan();
     }
+//TODO
+    //Check permission for wifi access (newer versions (android m) of android need to allow permissions at runtime)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public int checkSelfPermission(String permission) {
+        return super.checkSelfPermission(permission);
+    }
+
     HashMap featuresMap;
     public void footprintsConfigured(){
         String[] Columns = db.getDataSetColumns();
@@ -140,7 +157,7 @@ public class MainMap extends AppCompatActivity {
             return location;
         }else{
             Random n = new Random();
-            return n.nextInt(5) + 1;
+            return n.nextInt(15) + 1;
         }
     }
 
@@ -162,7 +179,6 @@ public class MainMap extends AppCompatActivity {
         DrawLine(floorMap.getX()+cooridor1[0],floorMap.getY()+sourceCoord[1] , floorMap.getX()+cooridor1[0],floorMap.getY()+destCoord[1], Color.RED);
         DrawLine(floorMap.getX()+cooridor1[0],floorMap.getY()+destCoord[1] , floorMap.getX()+destCoord[0],floorMap.getY()+destCoord[1], Color.RED);
 //        Toast.makeText(MainMap.this, floorMap.getX() + "," + floorMap.getY() + " floor coord", Toast.LENGTH_SHORT).show();
-        Toast.makeText(MainMap.this, cooridor1[0] + "," + cooridor1[1] + " corridor12 coord", Toast.LENGTH_SHORT).show();
 
     }
 

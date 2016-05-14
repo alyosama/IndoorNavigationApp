@@ -34,6 +34,13 @@
         android:adjustViewBounds="false"
         android:src="@drawable/route"
         android:foreground="@android:color/transparent" />
-
+    <ImageView
+        android:id="@+id/cross"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/location_marker"
+        android:visibility="invisible" />
 
 </android.support.design.widget.CoordinatorLayout>
