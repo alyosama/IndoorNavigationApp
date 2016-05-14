@@ -17,7 +17,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/floor_map" />
-
+    <ImageView
+        android:id="@+id/cross"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/location_marker"
+        android:visibility="visible" />
 
     <Spinner
         android:id="@+id/spinner"

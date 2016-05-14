@@ -52,7 +52,7 @@ public class Places extends AppCompatActivity {
         addPlaceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                helper.addPlace(placeTxt.getText().toString(), ++count, touch);
+                helper.addPlace(placeTxt.getText().toString(), ++count, viewCoords);
                 Toast.makeText(Places.this, viewCoords[0] + "," + viewCoords[1] + " added", Toast.LENGTH_SHORT).show();
             }
         });

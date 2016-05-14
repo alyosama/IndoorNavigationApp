@@ -28,6 +28,7 @@ public class Configure extends AppCompatActivity {
     WifiReceiver receiverWifi;
     Spinner placesSpinner;
     List<ScanResult> wifiList;
+
     boolean isRecord = false;
     ArrayList<Integer> featuresIDs;
     ArrayAdapter<String> dataAdapter;
