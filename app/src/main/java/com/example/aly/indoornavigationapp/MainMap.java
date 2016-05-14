@@ -73,9 +73,10 @@ public class MainMap extends AppCompatActivity {
         float sourceCoord[] = helper.getPlaceLocationByName("Room10");
         float cooridor1[] = helper.getPlaceLocationByName("corridor1");
         float destCoord[] = helper.getPlaceLocationByName(destination);
-        DrawLine(floorMap.getPivotX()+sourceCoord[0],floorMap.getPivotY()+sourceCoord[1] , floorMap.getPivotX()+cooridor1[0],floorMap.getPivotY()+sourceCoord[1], Color.RED);
-
-
+//        DrawLine(floorMap.getX()+sourceCoord[0],floorMap.getY()+sourceCoord[1] , floorMap.getX()+cooridor1[0],floorMap.getY()+sourceCoord[1], Color.RED);
+//        DrawLine(floorMap.getX()+cooridor1[0],floorMap.getY()+cooridor1[1] , floorMap.getX()+cooridor1[0],floorMap.getY()+destCoord[1], Color.RED);
+//        DrawLine(floorMap.getX()+cooridor1[0],floorMap.getY()+destCoord[1] , floorMap.getX()+destCoord[0],floorMap.getY()+destCoord[1], Color.RED);
+        
     }
 
     private void DrawLine(float x, float y, float xend, float yend, int color) {
