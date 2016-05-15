@@ -91,7 +91,7 @@ public class Places extends AppCompatActivity {
         Intent i = null;
         switch (item.getItemId()) {
             case R.id.view:
-                i = new Intent(this, Places.class);
+                i = new Intent(this, AddPlace.class);
                 startActivity(i);
                 return true;
         }

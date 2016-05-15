@@ -107,7 +107,7 @@ public class MainMap extends AppCompatActivity {
             //Toast.makeText(MainMap.this, locationCoord[0] + "," + locationCoord[1] + " mark coord", Toast.LENGTH_SHORT).show();
             cross.setX(locationCoord[0]+floorMap.getX()-cross.getWidth());
             cross.setY(locationCoord[1]+toolbar.getHeight()-floorMap.getY());
-            Toast.makeText(MainMap.this,"Room: "+String.valueOf(location),Toast.LENGTH_SHORT).show();
+           // Toast.makeText(MainMap.this,"Room: "+String.valueOf(location),Toast.LENGTH_SHORT).show();
         cross.setVisibility(View.VISIBLE);
         }
     }
@@ -157,7 +157,7 @@ public class MainMap extends AppCompatActivity {
             return location;
         }else{
             Random n = new Random();
-            return n.nextInt(15) + 1;
+            return n.nextInt(17) + 1;
         }
     }
 
@@ -172,12 +172,12 @@ public class MainMap extends AppCompatActivity {
 
         String destination = String.valueOf(placesSpinner.getSelectedItem());
         float sourceCoord[] = helper.getPlaceLocationByName("Room10");
-        float cooridor1[] = helper.getPlaceLocationByName("corridor12");
+        float cooridor1[] = helper.getPlaceLocationByName("corridor1");
         float destCoord[] = helper.getPlaceLocationByName(destination);
        // DrawLine(floorMap.getX()+sourceCoord[0],floorMap.getY()+sourceCoord[1] , floorMap.getX()+cooridor1[0],floorMap.getY()+sourceCoord[1], Color.BLUE);
-        DrawLine(floorMap.getX()+sourceCoord[0],floorMap.getY()+sourceCoord[1] , floorMap.getX()+cooridor1[0],floorMap.getY()+sourceCoord[1], Color.RED);
-        DrawLine(floorMap.getX()+cooridor1[0],floorMap.getY()+sourceCoord[1] , floorMap.getX()+cooridor1[0],floorMap.getY()+destCoord[1], Color.RED);
-        DrawLine(floorMap.getX()+cooridor1[0],floorMap.getY()+destCoord[1] , floorMap.getX()+destCoord[0],floorMap.getY()+destCoord[1], Color.RED);
+        DrawLine(floorMap.getX()+sourceCoord[0],sourceCoord[1]+toolbar.getHeight()-floorMap.getY(), floorMap.getX()+cooridor1[0],sourceCoord[1]+toolbar.getHeight()-floorMap.getY(), Color.RED);
+        DrawLine(floorMap.getX()+cooridor1[0],sourceCoord[1]+toolbar.getHeight()-floorMap.getY(), floorMap.getX()+cooridor1[0],destCoord[1]+toolbar.getHeight()-floorMap.getY(), Color.RED);
+        DrawLine(floorMap.getX()+cooridor1[0],destCoord[1] +toolbar.getHeight()-floorMap.getY(), floorMap.getX()+destCoord[0],destCoord[1]+toolbar.getHeight()-floorMap.getY(), Color.RED);
 //        Toast.makeText(MainMap.this, floorMap.getX() + "," + floorMap.getY() + " floor coord", Toast.LENGTH_SHORT).show();
 
     }

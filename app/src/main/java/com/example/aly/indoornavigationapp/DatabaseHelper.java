@@ -108,6 +108,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.getWritableDatabase().close();
     }
 
+    public void deletePlace(String name)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(PLACES_TABLE_NAME,"Name='" +name+"'",null);
+        db.close();
+    }
+
     public void addPlace(String name, int number, float[] viewCoords) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();

@@ -15,5 +15,31 @@
     <com.andexert.expandablelayout.library.ExpandableLayoutListView android:id="@+id/storedPlacesListView"
         xmlns:expandable="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/placesListView"
+        android:background="#10b4d1"
+        android:layout_marginBottom="101dp"
+        android:layout_above="@+id/showplace"
+        android:layout_alignParentEnd="true" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Info"
+        android:id="@+id/showplace"
+        android:layout_marginBottom="106dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete Place"
+        android:id="@+id/deletePlace"
+        android:layout_alignTop="@+id/showplace"
+        android:layout_alignEnd="@+id/placesListView" />
 </RelativeLayout>
