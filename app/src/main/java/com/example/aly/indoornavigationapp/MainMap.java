@@ -1,5 +1,6 @@
 package com.example.aly.indoornavigationapp;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,12 +8,16 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -21,6 +26,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Config;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -45,16 +52,19 @@ public class MainMap extends AppCompatActivity {
     DatabaseHelper helper;
     ArrayAdapter<String> dataAdapter;
     ImageView floorMap;
+    ImageView cross;
     CoordinatorLayout mainlayout;
     Toolbar toolbar;
 
+    Bitmap imageBitmap;
     public boolean isConfigured=false;
-     ImageView cross;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
         floorMap = (ImageView) findViewById(R.id.map);
+        imageBitmap= BitmapFactory.decodeResource(getResources(),R.drawable.floor_map);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         mainlayout = (CoordinatorLayout) findViewById(R.id.mainlayout);
         setSupportActionBar(toolbar);
@@ -104,13 +114,14 @@ public class MainMap extends AppCompatActivity {
         float locationCoord[]= helper.getPlaceLocation(location);
 
         if(locationCoord.length !=0){
-            //Toast.makeText(MainMap.this, locationCoord[0] + "," + locationCoord[1] + " mark coord", Toast.LENGTH_SHORT).show();
             cross.setX(locationCoord[0]+floorMap.getX()-cross.getWidth());
             cross.setY(locationCoord[1]+toolbar.getHeight()-floorMap.getY());
-           // Toast.makeText(MainMap.this,"Room: "+String.valueOf(location),Toast.LENGTH_SHORT).show();
+           Toast.makeText(MainMap.this,"Room: "+String.valueOf(location),Toast.LENGTH_SHORT).show();
         cross.setVisibility(View.VISIBLE);
         }
     }
+
+    @TargetApi(Build.VERSION_CODES.M)
     public void runWifi(){
         if (mainWifi.isWifiEnabled() == false) {
             // If wifi disabled then enable it
@@ -120,18 +131,35 @@ public class MainMap extends AppCompatActivity {
             mainWifi.setWifiEnabled(true);
         }
 
+
         // wifi scaned value broadcast receiver
         receiverWifi = new WifiReceiver();
         // Register broadcast receiver
         // Broacast receiver will automatically call when number of wifi connections changed
         registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
+
+//        if (checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 0x12345);
+//        }else{
+//            mainWifi.startScan();
+//            //do something, permission was previously granted; or legacy device
+//        }
         mainWifi.startScan();
     }
 //TODO
     //Check permission for wifi access (newer versions (android m) of android need to allow permissions at runtime)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 0x12345) {
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+            }
+            mainWifi.startScan();
+        }
+
     }
 
     @Override
@@ -157,7 +185,7 @@ public class MainMap extends AppCompatActivity {
             return location;
         }else{
             Random n = new Random();
-            return n.nextInt(17) + 1;
+            return n.nextInt(5) + 1;
         }
     }
 
@@ -168,30 +196,45 @@ public class MainMap extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadSpinnerData();
+    }
+
     public void findPath() {
 
         String destination = String.valueOf(placesSpinner.getSelectedItem());
-        float sourceCoord[] = helper.getPlaceLocationByName("Room10");
-        float cooridor1[] = helper.getPlaceLocationByName("corridor1");
-        float destCoord[] = helper.getPlaceLocationByName(destination);
-       // DrawLine(floorMap.getX()+sourceCoord[0],floorMap.getY()+sourceCoord[1] , floorMap.getX()+cooridor1[0],floorMap.getY()+sourceCoord[1], Color.BLUE);
-        DrawLine(floorMap.getX()+sourceCoord[0],sourceCoord[1]+toolbar.getHeight()-floorMap.getY(), floorMap.getX()+cooridor1[0],sourceCoord[1]+toolbar.getHeight()-floorMap.getY(), Color.RED);
-        DrawLine(floorMap.getX()+cooridor1[0],sourceCoord[1]+toolbar.getHeight()-floorMap.getY(), floorMap.getX()+cooridor1[0],destCoord[1]+toolbar.getHeight()-floorMap.getY(), Color.RED);
-        DrawLine(floorMap.getX()+cooridor1[0],destCoord[1] +toolbar.getHeight()-floorMap.getY(), floorMap.getX()+destCoord[0],destCoord[1]+toolbar.getHeight()-floorMap.getY(), Color.RED);
-//        Toast.makeText(MainMap.this, floorMap.getX() + "," + floorMap.getY() + " floor coord", Toast.LENGTH_SHORT).show();
+        float[] sourceCoord = helper.getPlaceLocation(getLocation());
+
+        cross.setVisibility(View.VISIBLE);
+        float[] destCoord = helper.getPlaceLocationByName(destination);
+        float[] midCoord={(sourceCoord[0]+destCoord[0])/2,sourceCoord[1]+destCoord[1]/2};
+
+        DrawLine(sourceCoord[0],sourceCoord[1], sourceCoord[0],midCoord[1], Color.RED);
+        DrawLine(sourceCoord[0],midCoord[1], destCoord[0],midCoord[1], Color.RED);
+        DrawLine(destCoord[0],midCoord[1], destCoord[0],destCoord[1], Color.RED);
 
     }
 
+
     private void DrawLine(float x, float y, float xend, float yend, int color) {
+        Bitmap overlay=Bitmap.createBitmap(imageBitmap.getWidth(), imageBitmap.getHeight(),Bitmap.Config.RGB_565);
+        Canvas canvas=new Canvas(overlay);
+        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        canvas.drawBitmap(imageBitmap, floorMap.getX(), floorMap.getY(),paint);
 
-        BitmapDrawable bmpDraw = (BitmapDrawable) floorMap.getDrawable();
-        Bitmap bmp = bmpDraw.getBitmap().copy(Bitmap.Config.RGB_565, true);
-        Canvas c = new Canvas(bmp);
-        Paint p = new Paint();
-        p.setColor(color);
-        c.drawLine(x, y, xend, yend, p);
-        floorMap.setImageBitmap(bmp);
 
+        x+=floorMap.getX()-cross.getWidth();
+        y+=toolbar.getHeight()-floorMap.getY();
+
+        paint.setColor(color);
+        paint.setStrokeWidth(12.0f);
+
+
+        canvas.drawLine(x, y, xend, yend, paint);
+        floorMap.setImageBitmap(overlay);
     }
 
     private void loadSpinnerData() {

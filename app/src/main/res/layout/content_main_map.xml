@@ -16,7 +16,9 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/floor_map" />
+        android:src="@drawable/floor_map"
+        android:background="#000000"
+        android:padding="1dp"/>
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="wrap_content"

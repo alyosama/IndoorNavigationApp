@@ -147,9 +147,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("Select X,Y from Places where Name like ?", conditions);
         c.moveToFirst();
 
-
+        if(c.getCount()!=0){
         coord[0] = c.getFloat(0);
-        coord[1] = c.getFloat(1);
+        coord[1] = c.getFloat(1);}
 
         db.close();
         return coord;
