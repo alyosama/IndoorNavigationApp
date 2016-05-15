@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 5;
     public static final String WAP_TABLE_NAME = "WAP";
     public static final String PLACES_TABLE_NAME = "Places";
-    private static final String DATASET_TABLE_NAME = "Dataset";
+    public static final String DATASET_TABLE_NAME = "Dataset";
 
     DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,7 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String sql_wap = "CREATE TABLE " + WAP_TABLE_NAME +
-                "( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, BSSID text not null, SSID text not null, Freq INTEGER);";
+                "( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, BSSID text not null, SSID ` not null, Freq INTEGER);";
 
         String sql_places = "CREATE TABLE " + PLACES_TABLE_NAME +
                 " ( ID INTEGER PRIMARY KEY AUTOINCREMENT not null, Name text not null, Number INTEGER not null," +
@@ -196,7 +196,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void addWAP(String bssid, String ssid, int freq) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("BSSID", bssid); // Contact Name
+        values.put("BSSID", bssid);
         values.put("SSID", ssid);
         values.put("Freq", freq);
         // Inserting Row
