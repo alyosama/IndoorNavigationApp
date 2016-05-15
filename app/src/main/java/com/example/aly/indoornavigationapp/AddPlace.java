@@ -50,6 +50,7 @@ public class AddPlace extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),"deleting"+((TextView)arg1).getText().toString(),Toast.LENGTH_LONG).show();
                         String s =((TextView) arg1).getText().toString();
                         helper.deletePlace(s);
+
                     }
                 });
             }
