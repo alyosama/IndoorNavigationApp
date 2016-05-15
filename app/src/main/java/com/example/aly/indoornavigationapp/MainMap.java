@@ -88,17 +88,20 @@ public class MainMap extends AppCompatActivity {
         findPathBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                findPath();
+                int location = getLocation();
+               // markLocation(location);
+                //findPath(location);
+
             }
         });
         final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                handler.postDelayed(this, 2000);
+                handler.postDelayed(this, 4000);
                int location = getLocation();
-                markLocation(location);
-
+               markLocation(location);
+                findPath(location);
             }
         };
         runnable.run();
@@ -116,11 +119,54 @@ public class MainMap extends AppCompatActivity {
         if(locationCoord.length !=0){
             cross.setX(locationCoord[0]+floorMap.getX()-cross.getWidth());
             cross.setY(locationCoord[1]+toolbar.getHeight()-floorMap.getY());
-           //Toast.makeText(MainMap.this,"Room: "+String.valueOf(location),Toast.LENGTH_SHORT).show();
+          // Toast.makeText(MainMap.this,"Room: "+String.valueOf(location),Toast.LENGTH_SHORT).show();
         cross.setVisibility(View.VISIBLE);
         }
     }
+    public void findPath(int location) {
 
+        String destination = String.valueOf(placesSpinner.getSelectedItem());
+        int room = getLocation();
+        float[] sourceCoord = helper.getPlaceLocation(location);
+        //Toast.makeText(MainMap.this,"Room: "+String.valueOf(room),Toast.LENGTH_SHORT).show();
+
+        float[] destCoord = helper.getPlaceLocationByName(destination);
+        float[] midCoord={(sourceCoord[0]+destCoord[0])/2
+                ,(sourceCoord[1]+destCoord[1])/2};
+        // float[] midCoord={sourceCoord[0]+(sourceCoord[0] - destCoord[0])/2,sourceCoord[1]+(sourceCoord[1]-destCoord[1])/2};
+        DrawLines(sourceCoord,midCoord,destCoord,Color.RED);
+        Toast.makeText(MainMap.this,"From: "+String.valueOf(location)+" to: "+helper.getPlaceNumber(destination),Toast.LENGTH_SHORT).show();
+       // Toast.makeText(MainMap.this,"toolbar:"+String.valueOf(toolbar.getWidth())+","+String.valueOf(toolbar.getHeight()+",y:"+String.valueOf(toolbar.getY())),Toast.LENGTH_LONG).show();
+
+    }
+
+    Canvas canvas;
+    private void DrawLines(float[] sourceCoord,float[] midCoord,float[] destCoord,int color){
+        Bitmap overlay=Bitmap.createBitmap(imageBitmap.getWidth(), imageBitmap.getHeight(),Bitmap.Config.ARGB_8888);
+        canvas=new Canvas(overlay);
+        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        canvas.drawBitmap(imageBitmap, floorMap.getX(), floorMap.getY(),paint);
+        //Toast.makeText(MainMap.this,"bitmap:"+String.valueOf(imageBitmap.getHeight())+",canvas:"+canvas.getHeight()+",lay"+overlay.getHeight()+",img"+floorMap.getHeight() , Toast.LENGTH_LONG).show();
+
+        DrawLine(sourceCoord[0],sourceCoord[1], midCoord[0],sourceCoord[1], Color.RED);
+        DrawLine(midCoord[0],sourceCoord[1], midCoord[0],destCoord[1], Color.BLUE);
+        DrawLine(midCoord[0],destCoord[1], destCoord[0],destCoord[1], Color.YELLOW);
+
+        floorMap.setImageBitmap(overlay);
+    }
+    private void DrawLine(float x,float y,float xend,float yend,int color){
+
+        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        paint.setColor(color);
+        paint.setStrokeWidth(12.0f);
+
+        x=x+floorMap.getX() +(canvas.getWidth()-floorMap.getWidth())/2;
+        y=y-toolbar.getHeight()-floorMap.getY()+(canvas.getHeight()-floorMap.getHeight());
+        xend=xend+floorMap.getX()+(canvas.getWidth()-floorMap.getWidth())/2;
+        yend=yend-toolbar.getHeight()-floorMap.getY()+(canvas.getHeight()-floorMap.getHeight());
+        canvas.drawLine(x, y, xend, yend, paint);
+
+    }
     @TargetApi(Build.VERSION_CODES.M)
     public void runWifi(){
         if (mainWifi.isWifiEnabled() == false) {
@@ -185,7 +231,7 @@ public class MainMap extends AppCompatActivity {
             return location;
         }else{
             Random n = new Random();
-            return n.nextInt(5) + 1;
+            return n.nextInt(10) + 1;
         }
     }
 
@@ -203,50 +249,7 @@ public class MainMap extends AppCompatActivity {
         loadSpinnerData();
     }
 
-    public void findPath() {
 
-        String destination = String.valueOf(placesSpinner.getSelectedItem());
-        int room = getLocation();
-        float[] sourceCoord = helper.getPlaceLocation(room);
-        Toast.makeText(MainMap.this,"Room: "+String.valueOf(room),Toast.LENGTH_SHORT).show();
-
-        float[] destCoord = helper.getPlaceLocationByName(destination);
-        float[] midCoord={(sourceCoord[0]+destCoord[0])/2.0f,(sourceCoord[1]+destCoord[1])/2.0f};
-       // float[] midCoord={sourceCoord[0]+(sourceCoord[0] - destCoord[0])/2,sourceCoord[1]+(sourceCoord[1]-destCoord[1])/2};
-
-        DrawLines(sourceCoord,midCoord,destCoord,Color.RED);
-    }
-
-
-    Canvas canvas;
-    private void DrawLines(float[] sourceCoord,float[] midCoord,float[] destCoord,int color){
-        Bitmap overlay=Bitmap.createBitmap(imageBitmap.getWidth(), imageBitmap.getHeight(),Bitmap.Config.ARGB_8888);
-        canvas=new Canvas(overlay);
-        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
-        canvas.drawBitmap(imageBitmap, floorMap.getX(), floorMap.getY(),paint);
-
-
-
-            DrawLine(sourceCoord[0],sourceCoord[1], midCoord[0],sourceCoord[1], Color.RED);
-            DrawLine(midCoord[0],sourceCoord[1], midCoord[0],destCoord[1], Color.RED);
-            DrawLine(midCoord[0],destCoord[1], destCoord[0],destCoord[1], Color.RED);
-
-        floorMap.setImageBitmap(overlay);
-    }
-
-    private void DrawLine(float x,float y,float xend,float yend,int color){
-
-        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
-        paint.setColor(color);
-        paint.setStrokeWidth(12.0f);
-
-        x+=floorMap.getX()-cross.getWidth();
-        y+=toolbar.getHeight()-floorMap.getY();
-        xend+=floorMap.getX()-cross.getWidth();
-        yend+=toolbar.getHeight()-floorMap.getY();
-        canvas.drawLine(x, y, xend, yend, paint);
-
-    }
     private void loadSpinnerData() {
         // Spinner Drop down elements
         // Creating adapter for spinner

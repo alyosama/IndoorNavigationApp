@@ -161,10 +161,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int id;
         Cursor c = db.rawQuery("Select Number from Places where Name like ?", conditions);
         c.moveToFirst();
+        if(c.getCount()!=0){
         id = c.getInt(0);
-
         db.close();
-        return id;
+        return id;}
+        else return 0;
     }
     public  String getPlaceName(int id)
     {
@@ -174,7 +175,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("Select Number from Places where Name like ?", conditions);
         c.moveToFirst();
         roomName = c.getString(0);
-
         db.close();
         return roomName;
     }
