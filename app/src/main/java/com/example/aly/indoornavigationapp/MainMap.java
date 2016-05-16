@@ -136,11 +136,12 @@ public class MainMap extends AppCompatActivity {
         cross.setY(y + toolbar.getHeight() - floorMap.getY());
         Toast.makeText(MainMap.this,"Room: "+name,Toast.LENGTH_SHORT).show();
         cross.setVisibility(View.VISIBLE);
+        findPath(x,y);
     }
-    public void findPath(int location) {
+    public void findPath(float x, float y) {
 
         String destination = String.valueOf(placesSpinner.getSelectedItem());
-        float[] sourceCoord = helper.getPlaceLocation(location);
+        float[] sourceCoord = {x,y};
         //Toast.makeText(MainMap.this,"Room: "+String.valueOf(room),Toast.LENGTH_SHORT).show();
 
         float[] destCoord = helper.getPlaceLocationByName(destination);
@@ -148,7 +149,6 @@ public class MainMap extends AppCompatActivity {
                 ,(sourceCoord[1]+destCoord[1])/2};
         // float[] midCoord={sourceCoord[0]+(sourceCoord[0] - destCoord[0])/2,sourceCoord[1]+(sourceCoord[1]-destCoord[1])/2};
         DrawLines(sourceCoord, midCoord, destCoord, Color.RED);
-        Toast.makeText(MainMap.this,"From: "+String.valueOf(location)+" to: "+helper.getPlaceNumber(destination),Toast.LENGTH_SHORT).show();
        // Toast.makeText(MainMap.this,"toolbar:"+String.valueOf(toolbar.getWidth())+","+String.valueOf(toolbar.getHeight()+",y:"+String.valueOf(toolbar.getY())),Toast.LENGTH_LONG).show();
 
     }
